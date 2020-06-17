@@ -1,5 +1,4 @@
 import 'package:app1/Modals/student.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -8,52 +7,53 @@ void main() {
   runApp(MaterialApp(home: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
-  String mesaj = "Student Report System";
-  List<Student> students = [
-    Student("Yasin", "Er", 21),
-    Student("Hasan", "Yılmaz", 65),
-    Student("Mehmet", "Gelve", 53)
-  ];
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
 
+class _MyAppState extends State<MyApp> {
+  String mesaj = "Student Report System";
+
+  Student selectedStudent = Student.withId(0, "", "", 0);
+
+
+  List<Student> students = [
+    Student.withId(1,"Yasin", "Er", 100),
+    Student.withId(2,"Hasan", "Yılmaz", 65),
+    Student.withId(3,"Mehmet", "Gelve", 45)
+  ];
 
   @override
   Widget build(BuildContext context) {
     //build metodu bizim widget döndürmemizi istiyor
 
-
     return Scaffold(
         appBar: AppBar(
           title: Text(mesaj),
         ),
-        body:
+        body: buildBody(context) //body içinde de widget türünde bi şey olmalı
 
-        buildBody(context) //body içinde de widget türünde bi şey olmalı
-
-    );
+        );
 
     throw UnimplementedError();
-  } //kendi witgetimizi ooluştururken StatelessWidgettan miras almak zorundayız
-
-  String resultOfExam(int not) {
-
-
   }
+
+  String resultOfExam(int not) {}
 
   void showMessage(BuildContext context, String message) {
     //contaxt ister
 
     var alert1 = AlertDialog(
       //art dialog yapısı oluşturduk
-      title: Text("Result of exam"),
+      title: Text("İşlem:"),
       content: Text(message),
     );
     //showDialog yazmadan göstermez
     showDialog(
         context: context,
         builder: (BuildContext context) =>
-        alert1); //BuildContexte hangi alerti göstermesi gerektiğini yazıyoruz
-
+            alert1); //BuildContexte hangi alerti göstermesi gerektiğini yazıyoruz
   }
 
   Widget buildBody(BuildContext context) {
@@ -62,43 +62,106 @@ class MyApp extends StatelessWidget {
     return Column(
       children: <Widget>[
         Expanded(
-            child:
-
-            ListView
-                .builder( //ListViewin builderi itemCount kadar itemBuilder bloğunu çalıştırmaya yarar
+            child: ListView.builder(
+                //ListViewin builderi itemCount kadar itemBuilder bloğunu çalıştırmaya yarar
                 itemCount: students.length,
-
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage("https://cdn.pixabay.com/photo/2019/05/16/16/50/man-4207514_1280.jpg") ,
-                    ) ,
-                    title: Text(students[index].firstName + " " +
+                      backgroundImage: NetworkImage(
+                          "https://cdn.pixabay.com/photo/2019/05/16/16/50/man-4207514_1280.jpg"),
+                    ),
+                    title: Text(students[index].firstName +
+                        " " +
                         students[index].lastName),
-                    subtitle: Text(
-                        "Result: " + students[index].grade.toString()),
+                    subtitle: Text("Result: " +
+                        students[index].grade.toString() +
+                        " [" +
+                        students[index].getStatus +
+                        "]"),
                     trailing: buildStatusIcon(students[index].grade),
-                    onTap: (){
-                      print(students[index].firstName + " " +
-                          students[index].lastName);
+                    onTap: () {
+                      setState(() {
+                        selectedStudent = students[index];
+                      });
                     },
-
                   );
-                })
-        ),
-        Center(
-          child: RaisedButton(
-            child: Text("Sonucu gör"),
-            onPressed: () {
-              //butona basarsa
+                })),
+        Text("Selected student: " + selectedStudent.firstName),
+        Row(
+          children: <Widget>[
 
-              var message = resultOfExam(0);
+            Flexible(
+              fit: FlexFit.tight,
+              flex: 2,
+              child: RaisedButton(
+                color:Colors.greenAccent,
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.add),
+                    SizedBox(width: 5.0),
+                    Text("New student"),
+                  ],
+                ),
+                onPressed: () {
+                  //butona basarsa
+                  var message = resultOfExam(0);
+                  //Burdaki context widget ağacının kendi contextinden gelir
+                  showMessage(context, "Added!");
+                },
+              ),
+            ),
 
-              //Burdaki context widget ağacının kendi contextinden gelir
-              showMessage(context, message);
-            },
-          ),
-        ),
+
+            Flexible(
+              fit: FlexFit.tight,
+              flex: 2,
+              child: RaisedButton(
+                color: Colors.amberAccent,
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.update),
+                    SizedBox(width: 5.0),//guncelle butonundan sonra 5 lik boşluk koy.
+                    Text("Update"),
+                  ],
+                ),
+                onPressed: () {
+                  //butona basarsa
+                  //Burdaki context widget ağacının kendi contextinden gelir
+                  showMessage(context, "Updated!");
+                },
+              ),
+            ),
+
+
+            Flexible(
+              fit: FlexFit.tight,
+              flex: 1,
+              child: RaisedButton(
+                color: Colors.deepOrange,
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.delete),
+                    SizedBox(width: 20.0),
+                    //Text("Delete"),
+                  ],
+                ),
+                onPressed: () {
+                  setState(() {
+                    students.remove(selectedStudent);
+                  });
+
+
+
+
+                  //Burdaki context widget ağacının kendi contextinden gelir
+                  showMessage(context, selectedStudent.firstName + " deleted!");
+                },
+              ),
+            ),
+
+          ],
+        )
       ],
     );
   }
@@ -106,11 +169,11 @@ class MyApp extends StatelessWidget {
   Widget buildStatusIcon(int grade) {
     //Icon bir widgettır
 
-
     if (grade >= 50)
       return Icon(Icons.done);
+    else if (grade >= 40 && grade < 50)
+      return Icon(Icons.album);
     else
       return Icon(Icons.clear);
   }
-
 }
