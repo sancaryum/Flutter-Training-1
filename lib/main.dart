@@ -1,4 +1,5 @@
 import 'package:app1/Modals/student.dart';
+import 'package:app1/screens/StudentAdd.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -62,10 +63,13 @@ class _MyAppState extends State<MyApp> {
     return Column(
       children: <Widget>[
         Expanded(
-            child: ListView.builder(
+            child:
+            ListView.builder(
                 //ListViewin builderi itemCount kadar itemBuilder bloğunu çalıştırmaya yarar
                 itemCount: students.length,
                 itemBuilder: (BuildContext context, int index) {
+
+
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundImage: NetworkImage(
@@ -86,7 +90,7 @@ class _MyAppState extends State<MyApp> {
                       });
                     },
                   );
-                })),
+                }),),
         Text("Selected student: " + selectedStudent.firstName),
         Row(
           children: <Widget>[
@@ -105,9 +109,9 @@ class _MyAppState extends State<MyApp> {
                 ),
                 onPressed: () {
                   //butona basarsa
-                  var message = resultOfExam(0);
-                  //Burdaki context widget ağacının kendi contextinden gelir
-                  showMessage(context, "Added!");
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>StudentAdd(students)));
+
+
                 },
               ),
             ),
@@ -175,5 +179,10 @@ class _MyAppState extends State<MyApp> {
       return Icon(Icons.album);
     else
       return Icon(Icons.clear);
+  }
+
+  Widget listeCiz() {
+
+
   }
 }

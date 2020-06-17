@@ -17,6 +17,10 @@ Student(String firstName, String lastName,int grade){
 
 }
 
+Student.withoutInfo(){
+
+}
+
 String get getFirstName{
   return "OGR - " + this.firstName;
 }
